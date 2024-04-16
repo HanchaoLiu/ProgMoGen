@@ -1,0 +1,20 @@
+000130 a man walks forwards and then stops.
+000178 a person starts to walk backwards.
+000285 a person walks down steps.
+000337 person walks forwards and uses their right arm as support
+000363 a person walks a few steps, then begins to jog or run.
+000600 a person walks straight backward.
+000665 a person walks forward.
+000679 a person walks with a limp leg.
+000759 a person walks unbalanced as if they are on a tight rope.
+000998 a person walks forward, stumbles backwards, then walks forward again
+000099 a person jogs in place
+000696 the person is jogging forward.
+000700 a person jogs in a straight line.
+003703 a person jogs and hops over object.
+001161 a person runs forward in a line.
+001617 a person walks straight forward, turns, then runs back
+001848 person runs forward, pauses, then continues running.
+003193 a person runs back and forth
+003437 a person quickly runs foward.
+004455 a man is running in place and then steps backwards and crouches.
