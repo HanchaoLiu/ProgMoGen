@@ -22,7 +22,6 @@ TARGET=[0, 0.5, 0.2]+[2.0, 0.5, 0.2]
 # optimizer params
 lr=0.05
 iterations=90
-decay_steps=60
 decay_steps=None
 
 

@@ -10,10 +10,6 @@ from atomic_lib.math_utils import *
 task: overhead barrier.
 '''
 
-# TODO: requires token
-# TEXT_PROMPT="drunk walking animation turning around."
-# LENGTH=196
-# DEMO_NUM=4
 
 # optimizer params
 lr=0.01
@@ -21,9 +17,7 @@ iterations=70
 decay_steps=70//4*3
 
 
-# head=15
-# left_foot=10 
-# right_foot=11
+
 
 
 def loss_overhead_barrier(joints, length):
@@ -37,7 +31,7 @@ def loss_overhead_barrier(joints, length):
     loss_head = loss_head / 3
 
     # because of the motion prior, the feet will actually become closed to the ground.
-    # avoiding floating feet if using greater_than
+    # avoiding floating feet
     loss_foot = less_than( keyframe(dimY(get_joint(joints, left_foot)), t_middle), 0.0 ) + \
                 less_than( keyframe(dimY(get_joint(joints, right_foot)), t_middle), 0.0 )
     loss_foot = loss_foot / 2

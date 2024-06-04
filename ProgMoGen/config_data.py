@@ -1,18 +1,14 @@
 import os 
 
-# for mdm pretrained weight
-# args.json in the same directory.
-MODEL_PATH="/home/cscg/liuhc/code4/mdm_data/save/mdm_raw/model000475000.pt"
-
-# for clip model, used in mdm.py
-CLIP_VERSION="/home/cscg/liuhc/code4/mdm_data/clip_data/ViT-B-32.pt"
+# for mdm pretrained weight. Be sure to have args.json under the same directory.
+MODEL_PATH="./save/humanml_trans_enc_512/model000475000.pt"
 
 
 # Mean.npy/Std.npy, t2m_mean.npy/t2m_std.npy in ddim_*.py and DataTranform in run_demo_*.py 
 # t2m checkpoint in ProgMoGen/data_loaders/humanml/networks/evaluator_wrapper.py
 # $ROOT_DIR/dataset/HumanML3D in dataloaders/humanml/data/dataset.py
 # place HumanML3D dataset under $ROOT_DIR/dataset
-ROOT_DIR="/home/cscg/liuhc/code4/mdm_data"
+ROOT_DIR="."
 
 
 # for glove.
@@ -25,7 +21,6 @@ ABS_BASE_PATH=ROOT_DIR
 SMPL_MODEL_DIR_0 = os.path.join(ROOT_DIR, "body_models/")
 # utils/config.py
 SMPL_DATA_PATH_0 = os.path.join(SMPL_MODEL_DIR_0, "smpl")
-
 
 
 # for IK skeleton template

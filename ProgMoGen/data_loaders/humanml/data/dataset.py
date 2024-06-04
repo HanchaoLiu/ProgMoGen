@@ -1111,9 +1111,7 @@ class HumanML3D(data.Dataset):
                 self.t2m_dataset = PW3D_Text2MotionDatasetV2(self.opt, self.mean, self.std, self.split,
                                                              self.w_vectorizer)
             else:
-                # from IPython import embed 
-                # import sys 
-                # embed()
+
                 self.t2m_dataset = Text2MotionDatasetV2(self.opt, self.mean, self.std, self.split_file, self.w_vectorizer, **kwargs)
                 print("using text_only")
             self.num_actions = 1 # dummy placeholder

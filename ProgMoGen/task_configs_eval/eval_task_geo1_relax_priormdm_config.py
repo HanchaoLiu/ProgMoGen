@@ -27,7 +27,6 @@ lr=1e-5
 epoch_relax=1
 iterations=100
 
-# right_wrist=21
 
 joint_control=left_wrist
 
@@ -249,7 +248,7 @@ def ddim_sample_loop_opt_fn_goal_relaxed(
 
     noise_init.requires_grad=False
     eta=0.0
-    assert eta==0.0
+    
 
     self.length = model_kwargs['y']['lengths'].item()
 
@@ -364,7 +363,7 @@ def ddim_sample_loop_opt_fn_goal_relaxed(
 
     noise_init.requires_grad=False
     eta=0.0
-    assert eta==0.0
+    
 
 
     self.length = model_kwargs['y']['lengths'].item()

@@ -39,7 +39,7 @@ def f_loss(self, sample, sample_0, steps):
 
     loss_base = equal( get_joint(joints, control_joint), keyframe(get_joint(joints, control_joint),0) )
 
-    # loss reg on one foot
+    # loss reg on one foot. Preserve original motion.
     lower_body_joint_list = [pelvis, right_hip, right_knee, right_ankle, right_foot,
                                      left_hip, left_knee, left_ankle, left_foot]
     lower_body_idx_list = []

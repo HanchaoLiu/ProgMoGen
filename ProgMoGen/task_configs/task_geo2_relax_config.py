@@ -73,9 +73,7 @@ def update_goal(self, sample, target, target_relaxed, i_k):
 
 
 def transform_sample(self, sample_ret, target_relaxed, target):
-    # better all in torch
-    # TODO: change numpy to torch for line class, calc_RT_from_two_lines, apply_RT_on_joints.
-    # TODO: have run_demo_hoi1_relax.py, save target_list to npy, and call target_list from render_line.py
+    
     # transform sample_ret -> joints -> (R,T) -> joints_new -> sample_ret_new 
     line_relax  = construct_line(target_relaxed[0,:3], target_relaxed[0, 3:])
 

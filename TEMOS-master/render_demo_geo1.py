@@ -102,8 +102,7 @@ def magnify_root_traj(data,data_joint, original_root_traj):
 
 
 def set_plane_params():
-    # NOTE: directly write 4 points on the desired plane here.
-    # directly input 4 points here.
+    # NOTE: write 4 points on the desired plane here.
     
     plane = [[-0.9649365283548832, 0.0, -0.14025388658046722], 
              [-0.9649365283548832, 2.0, -0.14025388658046722], 
@@ -161,7 +160,7 @@ def render_cli(cfg: DictConfig) -> None:
             # data, data_joint = magnify_root_traj(data,data_joint, original_root_traj)
             data, data_joint = do_reverse(data, data_joint)
 
-            # plane
+            # # plane parameters are hard-coded here.
             plane_4points = set_plane_params()
             plane_4points = reorder_plane_pts(plane_4points)
             print('plane_4joints=\n',plane_4points)

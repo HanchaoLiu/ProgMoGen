@@ -334,8 +334,7 @@ class GaussianDiffusion_v2:
 
         if 'inpainting_mask' in model_kwargs['y'].keys() and 'inpainted_motion' in model_kwargs['y'].keys():
             inpainting_mask, inpainted_motion = model_kwargs['y']['inpainting_mask'], model_kwargs['y']['inpainted_motion']
-            # from IPython import embed 
-            # embed()
+
             # assert self.model_mean_type == ModelMeanType.START_X, 'This feature supports only X_start pred for mow!'
             
             assert model_output.shape == inpainting_mask.shape == inpainted_motion.shape
@@ -418,11 +417,7 @@ class GaussianDiffusion_v2:
         assert (
             model_mean.shape == model_log_variance.shape == pred_xstart.shape == x.shape
         )
-        # from IPython import embed 
-        # import sys 
-        # print("model mean and var")
-        # embed()
-        # sys.exit(0)
+
         return {
             "mean": model_mean,
             "variance": model_variance,
@@ -734,17 +729,11 @@ class GaussianDiffusion_v2:
         if dump_steps is not None:
             return dump
         
-        # from IPython import embed  
-        # print("111")
-        
-        # final_sample = res_list[-1][0]
-        # loss = final_sample.mean()
-        # loss.backward()
-        # for it in range(0,self.num_timesteps,20):
+
         for it in range(10):
             noise_i = res_list[it][1]
             print(it, noise_i.shape, noise_i.requires_grad, noise_i.mean().item(), noise_i.std().item())
-        # embed()
+
 
         final_sample = res_list[-1][0]
         loss = final_sample.mean()

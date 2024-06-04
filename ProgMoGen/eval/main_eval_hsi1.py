@@ -58,11 +58,14 @@ def get_head_height_loss(npy_file_name, constraint):
         head_all.append( [y0_head, y1_head, y2_head] )
 
     head_all = np.array(head_all)
-    print(constraint.shape, head_all.shape)
+    # print(constraint.shape, head_all.shape)
 
     rmse = np.sqrt( ((head_all - constraint)**2).mean() )
     rmae = np.abs(head_all-constraint).mean()
-    print(f"rmse = {rmse:.4f}, mae = {rmae:.6f}")
+    # print(f"rmse = {rmse:.4f}, mae = {rmae:.6f}")
+    print(f"constraint_error(mae) = {rmae:.6f}")
+
+    
 
     threshold = 0.05 
     err = np.abs(head_all - constraint)

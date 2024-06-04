@@ -93,11 +93,6 @@ def evaluate_matching_score(eval_wrapper, motion_loaders, file):
     for motion_loader_name, motion_loader in motion_loaders.items():
         
 
-        # print("match score")
-        # from IPython import embed 
-        # embed()
-        # sys.exit(0)
-
         all_motion_embeddings = []
         score_list = []
         all_size = 0
@@ -126,11 +121,6 @@ def evaluate_matching_score(eval_wrapper, motion_loaders, file):
 
                 all_motion_embeddings.append(motion_embeddings.cpu().numpy())
 
-            # from IPython import embed
-            # import sys
-            # print("motion embeddings") 
-            # embed()
-            # sys.exit(0)
 
 
             all_motion_embeddings = np.concatenate(all_motion_embeddings, axis=0)
@@ -583,12 +573,12 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
     # here has a grad!!!
     # with torch.no_grad():
 
-    # ref_data = np.load("/home/cscg/liuhc/m/ref_data/n544_data.npy", allow_pickle=True)
+    # ref_data = np.load("n544_data.npy", allow_pickle=True)
     # ref_text_prompt_list = [each_sample[0] for each_sample in ref_data]
     # ref_tokens_list      = [each_sample[1] for each_sample in ref_data]
     # ref_length_list      = [int(each_sample[2]) for each_sample in ref_data]
     # # (544,3)
-    # input_constraint_file = "/home/cscg/liuhc/m/demo_remote_data/debug_headgt_all4_n512_stat/head_raw_gt_pos_npy/gen.npy"
+    # input_constraint_file = "head_raw_gt_pos_npy/gen.npy"
     # ref_constraint = np.load(input_constraint_file, allow_pickle=True).item()['constraint']
 
 
@@ -965,7 +955,7 @@ if __name__ == '__main__':
     fixseed(args.seed)
 
     args.batch_size = 32 # This must be 32! Don't change it! otherwise it will cause a bug in R precision calc!
-    args.model_path = MODEL_PATH
+
     name = os.path.basename(os.path.dirname(args.model_path))
     niter = os.path.basename(args.model_path).replace('model', '').replace('.pt', '')
 
@@ -1120,6 +1110,7 @@ if __name__ == '__main__':
         np.save(save_npy_path_2, res_list)
         print("save to ", save_npy_path_2)
 
+    print("-"*80)
     print("fid mean = ", np.mean(fid_all_list))
 
 

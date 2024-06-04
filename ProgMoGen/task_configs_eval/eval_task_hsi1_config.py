@@ -115,9 +115,9 @@ def ddim_sample_loop_opt_fn(
     self.load_inv_normalization_data(device)
 
     noise_init.requires_grad=False
-    # assert eta==1.0
+    # 
     eta=0.0
-    assert eta==0.0
+    
 
     # fit plane first 
     pred_res, res_list, pred_x0_list = self.f_forward_return_middle_list(model, shape, noise_list, noise_init, init_image, model_kwargs, eta=eta, progress=False)

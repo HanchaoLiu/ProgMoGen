@@ -16,17 +16,14 @@ TEXT_TOKEN='sos/OTHER_a/DET_person/NOUN_walk/VERB_forward/ADV_rather/ADV_slowly/
 LENGTH=96
 # DEMO_NUM=9
 DEMO_NUM=1
-# DEMO_NUM=5
-# DEMO_NUM=32
+
 
 # optimizer params
 lr=0.05
 iterations=60
 decay_steps=None
 
-# lr=0.05
-# iterations=100
-# decay_steps=60
+
 
 
 
@@ -82,7 +79,7 @@ def f_loss(self, sample, sample_0, it):
         loss = loss_j20 + loss_j21
         return loss 
 
-    # regularization term on [r_velocity, l_velocity]
+    # regularization term on [r_velocity, l_velocity]. Avoid standing still.
     loss_root = equal(sample[:,:3,:,:], sample_0[:,:3,:,:])
 
     loss_two_hands      = loss_two_hands(sample, margin=0.4)

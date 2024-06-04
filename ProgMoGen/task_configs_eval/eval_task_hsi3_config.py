@@ -9,11 +9,6 @@ from atomic_lib.math_utils import *
 task: inside a square.
 '''
 
-# TODO: requires token
-# TEXT_PROMPT="drunk walking animation turning around."
-# LENGTH=196
-# DEMO_NUM=4
-
 
 # optimizer params
 lr=0.005

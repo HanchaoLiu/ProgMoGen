@@ -82,10 +82,10 @@ def save_npy(file_name, dt):
 
 def main_table2():
 
-    ref_gen_file = "/home/cscg/liuhc/m/demo_remote_data/debug_limited_n32_stat/limited_ours_pos_npy/gen.npy"
+    ref_gen_file = "limited_ours_pos_npy/gen.npy"
 
-    text_id_list_file = "/home/cscg/liuhc/code4/mdm_data/dataset/HumanML3D/test_plane_v0_id.txt"
-    text_dir = "/home/cscg/liuhc/code3/priormdm-main-0907/dataset/HumanML3D/texts"
+    text_id_list_file = "dataset/HumanML3D/test_plane_v0_id.txt"
+    text_dir = "dataset/HumanML3D/texts"
 
     
     text_to_tokens_dt = get_text_to_tokens_mapping(text_id_list_file, text_dir)
@@ -103,7 +103,7 @@ def main_table2():
         print(line)
 
 
-    save_name = "/home/cscg/liuhc/m/ref_data/n32_data.npy"
+    save_name = "ref_data/n32_data.npy"
     save_npy(save_name, ref_gen_data)
 
     x = np.load(save_name, allow_pickle=True)
@@ -113,10 +113,10 @@ def main_table2():
 
 def main_table1():
 
-    ref_gen_file = "/home/cscg/liuhc/m/demo_remote_data/debug_headgt_all4_n512_stat/head_ours_gt_pos_npy/gen.npy"
+    ref_gen_file = "head_ours_gt_pos_npy/gen.npy"
 
-    text_id_list_file = "/home/cscg/liuhc/code4/mdm_data/dataset/HumanML3D/test_all_id.txt"
-    text_dir = "/home/cscg/liuhc/code3/priormdm-main-0907/dataset/HumanML3D/texts"
+    text_id_list_file = "dataset/HumanML3D/test_all_id.txt"
+    text_dir = "dataset/HumanML3D/texts"
 
     
     text_to_tokens_dt = get_text_to_tokens_mapping(text_id_list_file, text_dir)
@@ -134,7 +134,7 @@ def main_table1():
         print(line)
 
 
-    save_name = "/home/cscg/liuhc/m/ref_data/n544_data.npy"
+    save_name = "ref_data/n544_data.npy"
     save_npy(save_name, ref_gen_data)
 
     x = np.load(save_name, allow_pickle=True)
@@ -147,7 +147,7 @@ def main_table1():
 
 def check_ref_file():
 
-    EVAL_SAMPLE32_FILE_NAME = "/home/cscg/liuhc/m/ref_data/n32_data.npy"
+    EVAL_SAMPLE32_FILE_NAME = "ref_data/n32_data.npy"
     ref_n32_data = np.load(EVAL_SAMPLE32_FILE_NAME, allow_pickle=True)
             
     ref_text_prompt_list = [each_sample[0] for each_sample in ref_n32_data]
@@ -160,7 +160,7 @@ def check_ref_file():
 # 0404: length_list for hoi1 is not fixed. fix this bug and regenerate ref_file
 def save_ref_file_hoi1():
 
-    EVAL_HOI1_FILE_NAME = "/home/cscg/liuhc/m/ref_data/hoi1_eval_data.npy"
+    EVAL_HOI1_FILE_NAME = "ref_data/hoi1_eval_data.npy"
     # ref_n32_data = np.load(EVAL_HOI1_FILE_NAME, allow_pickle=True)
             
     # ref_text_prompt_list = [each_sample[0] for each_sample in ref_n32_data]
@@ -207,8 +207,7 @@ def save_ref_file_hoi1():
         each = [ TEXT_PROMPT_LIST[i], None, LENGTH_LIST[i], target[i] ]
         dt.append(each)
 
-    # from IPython import embed 
-    # embed()
+
     print(dt)
     np.save(EVAL_HOI1_FILE_NAME, dt)
 
@@ -217,7 +216,7 @@ def save_ref_file_hoi1():
 
 
 def check_load_hoi1():
-    EVAL_HOI1_FILE_NAME = "/home/cscg/liuhc/m/ref_data/hoi1_eval_data.npy"
+    EVAL_HOI1_FILE_NAME = "ref_data/hoi1_eval_data.npy"
     
     ref_n32_data = np.load(EVAL_HOI1_FILE_NAME, allow_pickle=True)
             
@@ -236,16 +235,16 @@ def check_load_hoi1():
 
 def save_ref_file_hsi1():
 
-    ref_data = np.load("/home/cscg/liuhc/m/ref_data/n544_data.npy", allow_pickle=True)
+    ref_data = np.load("ref_data/n544_data.npy", allow_pickle=True)
     ref_text_prompt_list = [each_sample[0] for each_sample in ref_data]
     ref_tokens_list      = [each_sample[1] for each_sample in ref_data]
     ref_length_list      = [int(each_sample[2]) for each_sample in ref_data]
 
     # (544,3)
-    input_constraint_file = "/home/cscg/liuhc/m/demo_remote_data/debug_headgt_all4_n512_stat/head_raw_gt_pos_npy/gen.npy"
+    input_constraint_file = "head_raw_gt_pos_npy/gen.npy"
     ref_constraint = np.load(input_constraint_file, allow_pickle=True).item()['constraint']
 
-    save_file_name = "/home/cscg/liuhc/m/ref_data/hsi1_n544_eval_data.npy"
+    save_file_name = "ref_data/hsi1_n544_eval_data.npy"
 
     n_samples = len(ref_text_prompt_list)
     dt = []

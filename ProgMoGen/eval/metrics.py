@@ -272,9 +272,7 @@ def calculate_foot_contact_ratio(motions):
     # -> (1,len)
     feet_contact = np.logical_or(feet_contact[:,0,:], feet_contact[:,1,:])
     foot_contact_ratio = feet_contact.sum() / feet_contact.shape[1]
-    # from IPython import embed 
-    # embed()
-    # exit(0)
+
     return foot_contact_ratio
 
     if False:

@@ -7,7 +7,6 @@ import time
 from data_loaders.humanml.common.skeleton import Skeleton
 from data_loaders.humanml.utils.paramUtil import t2m_raw_offsets, t2m_kinematic_chain
 
-from config_data import SKEL_JOINTS_TEMPLATE_FILE_NAME
 
 from atomic_lib.math_utils import * 
 '''
@@ -28,28 +27,16 @@ def loss_limited_space(joints):
     return loss 
 
 
-def f_loss(self, sample, frame0):
-    # joints = self.sample_to_joints(sample)
-    joints = self.sample_to_joints_from_rot(sample, frame0)
+def f_loss(self, sample, sample_0, step):
+    joints = self.sample_to_joints(sample)
     loss = loss_limited_space(joints)
-
-    joints_num=22
-    start_indx = 1 + 2 + 1 + (joints_num - 1) * 3
-    end_indx = start_indx + (joints_num - 1) * 6
-    loss_reg = F.mse_loss(sample[:,0:end_indx,:,1:],sample[:,0:end_indx,:,:-1])
-    loss = loss + loss_reg
-
     return loss 
 
 
-def f_eval(self, sample, frame0):
-    # joints = self.sample_to_joints(sample)
-    joints = self.sample_to_joints_from_rot(sample, frame0)
+def f_eval(self, sample, sample_0):
+    joints = self.sample_to_joints(sample)
     loss = loss_limited_space(joints)
     return loss
-
-
-
 
 
 
@@ -110,44 +97,16 @@ def ddim_sample_loop_opt_fn(
     # load dataset std 
     self.load_inv_normalization_data(device)
 
-    # load templates
-    self.skel_joints_template = load_frame0_template(device)
-    self.skeleton = load_skeleton(device)
 
     noise_init.requires_grad=False
     # 
     eta=0.0
     
 
-    joints_pos_frame0 = self.skel_joints_template
 
     # get first
     pred_res, res_list, pred_x0_list = self.f_forward_return_middle_list(model, shape, noise_list, noise_init, init_image, model_kwargs, eta=eta, progress=False)
     pred_res_0=pred_res.detach().clone()
-    pred_res.requires_grad=True
-
-    base_lr = 1e-2
-    max_it = 120
-    optimizer = optim.Adam([pred_res], base_lr)
-    for it in range(max_it):
-
-        self.adjust_learning_rate(optimizer,base_lr,it,step=int(max_it/6*5))
-        lr_curr = self.get_optimizer_lr(optimizer)
-
-        optimizer.zero_grad()
-
-        loss_head = self.f_loss(pred_res, joints_pos_frame0)
-        loss = loss_head
-        # print(f"{it}, lr={lr_curr:.4f}, loss={loss.item():.6f}, loss_head={loss_head.item():.6f}")
-        
-        loss.backward()
-        optimizer.step()
-        # del pred_res, res_list, pred_x0_list
-        
-    loss = self.f_loss(pred_res, joints_pos_frame0)
-    print("[last] loss = ", loss)
-        
-    self.loss_str = f"loss={loss.item():.4f}"
 
     pred_res_ret = pred_res.detach().clone()
             
@@ -156,27 +115,10 @@ def ddim_sample_loop_opt_fn(
     print(f"t = {t_elapsed:.1f}")
 
     # get loss 
-    loss_head = self.f_eval(pred_res_ret, joints_pos_frame0)
+    loss_head = self.f_eval(pred_res_ret, pred_res_0)
     self.loss_ret_val = loss_head.data.cpu().numpy()
 
     return pred_res_ret
-
-
-
-
-def load_frame0_template(device):
-    x = np.load(SKEL_JOINTS_TEMPLATE_FILE_NAME, allow_pickle=True).item()
-    motion = x["motion"][0:1,:,:,0]
-    motion = th.FloatTensor(motion).to(device)
-    return motion
-
-def load_skeleton(device):
-    n_raw_offsets = th.from_numpy(t2m_raw_offsets)
-    kinematic_chain = t2m_kinematic_chain
-    skeleton = Skeleton(n_raw_offsets, kinematic_chain, device)
-    return skeleton
-
-
 
 
 

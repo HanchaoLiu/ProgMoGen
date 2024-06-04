@@ -26,6 +26,7 @@ def f_loss(self, sample, sample_0, step):
     
     joints = self.sample_to_joints(sample)
     # loss_confined_space = loss_ifelse_wholebody(joints, self.length)
+    # loss_reg on trajectory. Avoid standing still.
     loss_reg = equal( sample[:,0:4,:,:self.length], sample_0[:,0:4,:,:self.length] )
 
     joints = joints[:,:,:, :self.length]

@@ -77,86 +77,6 @@ def f_add_args(parser):
 # evaluation
 ####################################################################
 
-
-def eval_stat_each(groundtruth_loader, eval_wrapper, device):
-    print('========== Evaluating FID ==========')
-    gt_motion_embeddings = []
-    with torch.no_grad():
-        for idx, batch in enumerate(groundtruth_loader):
-            # _, _, _, sent_lens, motions, m_lens, _, _ = batch
-            motions , m_lens = batch
-            motions = motions.to(device)
-            m_lens  = m_lens.to(device)
-            motion_embeddings = eval_wrapper.get_motion_embeddings(
-                motions=motions,
-                m_lens=m_lens
-            )
-            gt_motion_embeddings.append(motion_embeddings.cpu().numpy())
-    gt_motion_embeddings = np.concatenate(gt_motion_embeddings, axis=0)
-    gt_mu, gt_cov = calculate_activation_statistics(gt_motion_embeddings)
-    return gt_mu, gt_cov
-    
-
-
-def evaluate_matching_score_my(eval_wrapper, gen_loader):
-    match_score_dict = OrderedDict({})
-    R_precision_dict = OrderedDict({})
-    activation_dict = OrderedDict({})
-
-    
-    motion_loaders = {"gen_loader": gen_loader}
-
-    print('========== Evaluating Matching Score ==========')
-    for motion_loader_name, motion_loader in motion_loaders.items():
-        
-        all_motion_embeddings = []
-        score_list = []
-        all_size = 0
-        matching_score_sum = 0
-        top_k_count = 0
-        # print(motion_loader_name)
-        with torch.no_grad():
-            for idx, batch in enumerate(motion_loader):
-                word_embeddings, pos_one_hots, _, sent_lens, motions, m_lens, _, _ = batch
-                text_embeddings, motion_embeddings = eval_wrapper.get_co_embeddings(
-                    word_embs=word_embeddings,
-                    pos_ohot=pos_one_hots,
-                    cap_lens=sent_lens,
-                    motions=motions,
-                    m_lens=m_lens
-                )
-                dist_mat = euclidean_distance_matrix(text_embeddings.cpu().numpy(),
-                                                     motion_embeddings.cpu().numpy())
-                matching_score_sum += dist_mat.trace()
-
-                argsmax = np.argsort(dist_mat, axis=1)
-                top_k_mat = calculate_top_k(argsmax, top_k=3)
-                top_k_count += top_k_mat.sum(axis=0)
-
-                all_size += text_embeddings.shape[0]
-
-                all_motion_embeddings.append(motion_embeddings.cpu().numpy())
-
-            all_motion_embeddings = np.concatenate(all_motion_embeddings, axis=0)
-            matching_score = matching_score_sum / all_size
-            R_precision = top_k_count / all_size
-            match_score_dict[motion_loader_name] = matching_score
-            R_precision_dict[motion_loader_name] = R_precision
-            activation_dict[motion_loader_name] = all_motion_embeddings
-
-        print(f'---> [{motion_loader_name}] Matching Score: {matching_score:.4f}')
-        # print(f'---> [{motion_loader_name}] Matching Score: {matching_score:.4f}', file=file, flush=True)
-
-        line = f'---> [{motion_loader_name}] R_precision: '
-        for i in range(len(R_precision)):
-            line += '(top %d): %.4f ' % (i+1, R_precision[i])
-        print(line)
-        # print(line, file=file, flush=True)
-    # return match_score_dict, R_precision_dict, activation_dict
-    return R_precision_dict
-
-
-
 def renorm(data, dataset):
     # gen_loader.dataset.mean_for_eval
     # motion_gt =  torch.Size([32, 196, 263]) 
@@ -170,27 +90,6 @@ def renorm(data, dataset):
 
 
 
-def get_motion_embeddings(groundtruth_loader, eval_wrapper, device):
-    print('========== Evaluating Motion embeddings ==========')
-    gt_motion_embeddings = []
-    with torch.no_grad():
-        for idx, batch in enumerate(groundtruth_loader):
-            # _, _, _, sent_lens, motions, m_lens, _, _ = batch
-            motions , m_lens = batch
-            motions = motions.to(device)
-            m_lens  = m_lens.to(device)
-            motion_embeddings = eval_wrapper.get_motion_embeddings(
-                motions=motions,
-                m_lens=m_lens
-            )
-            gt_motion_embeddings.append(motion_embeddings.cpu().numpy())
-    gt_motion_embeddings = np.concatenate(gt_motion_embeddings, axis=0)
-    # gt_mu, gt_cov = calculate_activation_statistics(gt_motion_embeddings)
-    # return gt_mu, gt_cov
-    return gt_motion_embeddings
-
-
-
 def collate_fn(batch):
     batch.sort(key=lambda x: x[3], reverse=True)
     return default_collate(batch)
@@ -200,107 +99,8 @@ def collate_fn(batch):
 
 
 ####################################################################
-# evaluation dataloader
-####################################################################
-
-class Motion_and_length_dataset(torch.utils.data.Dataset):
-    def __init__(self, motion_list, length_list):
-        self.motion_list = motion_list 
-        self.length_list = length_list 
-
-    def __getitem__(self, idx):
-        return self.motion_list[idx], self.length_list[idx]
-    
-    def __len__(self):
-        return len(self.motion_list)
-    
-
-class Motion_all_dataset(torch.utils.data.Dataset):
-
-    def __init__(self, motion_list, length_list, caption_list, tokens_list, cap_len_list):
-        self.motion_list = motion_list 
-        self.length_list = length_list 
-        self.caption_list = caption_list
-        self.tokens_list = tokens_list
-        self.cap_len_list = cap_len_list
-
-        abs_base_path = ABS_BASE_PATH
-        self.w_vectorizer = WordVectorizer(pjoin(abs_base_path, 'glove'), 'our_vab')
-    
-    def __len__(self):
-        return len(self.motion_list)
-
-    def __getitem__(self, item):
-        # data = self.generated_motion[item]
-        # motion, m_length, caption, tokens = data['motion'], data['length'], data['caption'], data['tokens']
-        # sent_len = data['cap_len']
-
-        motion = self.motion_list[item]
-        m_length = self.length_list[item]
-        caption = self.caption_list[item]
-        tokens = self.tokens_list[item]
-        sent_len = self.cap_len_list[item]
-
-        pos_one_hots = []
-        word_embeddings = []
-        for token in tokens:
-            word_emb, pos_oh = self.w_vectorizer[token]
-            pos_one_hots.append(pos_oh[None, :])
-            word_embeddings.append(word_emb[None, :])
-        pos_one_hots = np.concatenate(pos_one_hots, axis=0)
-        word_embeddings = np.concatenate(word_embeddings, axis=0)
-
-        # if m_length < self.opt.max_motion_length:
-        # max_motion_length = 196
-        # if m_length < max_motion_length:
-        #     motion = np.concatenate([motion,
-        #                              np.zeros((max_motion_length - m_length, motion.shape[1]))
-        #                              ], axis=0)
-        return word_embeddings, pos_one_hots, caption, sent_len, motion, m_length, '_'.join(tokens), []
-
-
-
-####################################################################
 # get gt / generated motions
 ####################################################################
-
-def get_gt_motion(args, dataloader, num_samples_limit):
-    real_num_batches = len(dataloader)
-    if num_samples_limit is not None:
-        real_num_batches = num_samples_limit // dataloader.batch_size + 1
-    print('real_num_batches', real_num_batches)
-
-    generated_motion = []
-    m_lens_list = []
-    text_list = []
-
-    # for idx, batch in enumerate(groundtruth_loader):
-    #         _, _, _, sent_lens, motions, m_lens, _, _ = batch
-    #         motion_embeddings = eval_wrapper.get_motion_embeddings(
-    #             motions=motions,
-    #             m_lens=m_lens
-    #         )
-    
-    # for _ in range(real_num_batches//len(dataloader)):
-    # if True:
-    for _ in range(1):
-        # for i, batch in tqdm(enumerate(dataloader)):
-        for i, batch in enumerate(dataloader):
-            # _, _, _, sent_lens, motions, m_lens, _, _ = batch
-            _, _, text_tuple, sent_lens, motions, m_lens, _, _ = batch
-            
-            motion = motions
-            # print("len(generated_motion)=", len(generated_motion))
-            if num_samples_limit is not None and len(generated_motion) >= real_num_batches:
-                break
-            generated_motion.append(motion.data.cpu().detach())
-            m_lens_list.append(m_lens.data.cpu().detach())
-            text_list += list(text_tuple)
-    generated_motion = torch.cat(generated_motion, 0)
-    m_lens_list = torch.cat(m_lens_list, 0)
-    assert len(m_lens_list)==len(text_list)
-    return generated_motion, m_lens_list, text_list
-
 
 def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motion_type):
 
@@ -309,9 +109,11 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
     # sample_fn = (
     #     diffusion.p_sample_loop if not use_ddim else diffusion.ddim_sample_loop
     # )
-    real_num_batches = len(dataloader)
-    if num_samples_limit is not None:
-        real_num_batches = num_samples_limit // dataloader.batch_size + 1
+    # real_num_batches = len(dataloader)
+    # if num_samples_limit is not None:
+    #     real_num_batches = num_samples_limit // dataloader.batch_size + 1
+    batch_size = 32
+    real_num_batches = num_samples_limit // batch_size + 1
     print('real_num_batches', real_num_batches)
 
     generated_motion = []
@@ -335,24 +137,28 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
 
     # for _ in range(real_num_batches//len(dataloader)):
     for _ in range(1):
-        for i, (motion, model_kwargs) in enumerate(dataloader):
+        # for i, (motion, model_kwargs) in enumerate(dataloader):
+        for i in range(1):
+
+            model_kwargs = {'y': {}}
+            motion = torch.zeros(batch_size,263,1,196).float()
 
             # print("len(generated_motion)=", len(generated_motion))
 
             if num_samples_limit is not None and len(generated_motion) >= real_num_batches:
                 break
 
-            tokens = [t.split('_') for t in model_kwargs['y']['tokens']]
-
-
             text_prompt = import_class(f"{args.task_config}.TEXT_PROMPT")
             motion_length = import_class(f"{args.task_config}.LENGTH")
             text_token = import_class(f"{args.task_config}.TEXT_TOKEN")
             
-            model_kwargs['y']['text'] = [text_prompt]*32
+            model_kwargs['y']['text'] = [text_prompt]*batch_size
             # model_kwargs['y']['tokens'] = [None]*32
-            model_kwargs['y']['tokens'] = [text_token]*32
-            model_kwargs['y']['lengths'] = torch.LongTensor([motion_length]*32)
+            model_kwargs['y']['tokens'] = [text_token]*batch_size
+            model_kwargs['y']['lengths'] = torch.LongTensor([motion_length]*batch_size)
+
+            
+            tokens = [(t.split('_') if t is not None else [] ) for t in model_kwargs['y']['tokens']]
 
 
             # add CFG scale to batch
@@ -360,11 +166,11 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
                 model_kwargs['y']['scale'] = torch.ones(motion.shape[0],
                                                         device=dist_util.dev()) * scale
             
+            # model_kwargs['y']['inpainted_motion'] = motion.to(dist_util.dev())
+            # model_kwargs['y']['inpainting_mask'] = torch.tensor(get_inpainting_mask(args.inpainting_mask, motion.shape)).float().to(dist_util.dev())
 
-            
-
-            model_kwargs['y']['inpainted_motion'] = motion.to(dist_util.dev())
-            model_kwargs['y']['inpainting_mask'] = torch.tensor(get_inpainting_mask(args.inpainting_mask, motion.shape)).float().to(dist_util.dev())
+            model_kwargs['y']['inpainted_motion'] = torch.zeros(batch_size,263,1,196).float().to(dist_util.dev())
+            model_kwargs['y']['inpainting_mask'] = torch.zeros(batch_size,263,1,196).float().to(dist_util.dev())
 
             repeat_times=1
             for t in range(repeat_times):
@@ -647,23 +453,6 @@ def get_loss_stat(loss_list):
 # save
 ####################################################################
 
-
-def save_to_npy(out_path, all_motions, all_text, all_lengths, fid):
-    '''
-    all in np.ndarray
-    all_motions:   # [bs, njoints, 3, seqlen], .e.g (1, 22, 3, 196)
-    all_text:     list 
-    all_lengths:  np.ndarray of int
-    '''
-    # npy_path = os.path.join(out_path, 'results.npy')
-    npy_path = out_path
-    print(f"saving results file to [{npy_path}]")
-    np.save(npy_path,
-            {'motion': all_motions, 'text': all_text, 'lengths': all_lengths,
-             'num_samples': 1, 'num_repetitions': 1,
-             'fid': np.array([fid])})
-    
-
 def save_to_npy_with_motion_gen(out_path, all_motions, all_text, all_lengths, fid, motion_gen, loss,
                                 constraint):
     '''
@@ -683,6 +472,9 @@ def save_to_npy_with_motion_gen(out_path, all_motions, all_text, all_lengths, fi
              'loss': loss,
              'constraint': constraint})
 
+class Gen_loader(object):
+    def __init__(self):
+        self.dataset = None
 
 
 if __name__ == '__main__':
@@ -692,7 +484,6 @@ if __name__ == '__main__':
     fixseed(args.seed)
 
     args.batch_size = 32 # This must be 32! Don't change it! otherwise it will cause a bug in R precision calc!
-    args.model_path = MODEL_PATH
     name = os.path.basename(os.path.dirname(args.model_path))
     niter = os.path.basename(args.model_path).replace('model', '').replace('.pt', '')
 
@@ -737,21 +528,13 @@ if __name__ == '__main__':
     logger.configure()
 
     logger.log("creating data loader...")
-    # split = 'test'
-    # split = 'test_plane'
-    # split = 'test_plane_v0_id'
     split = args.text_split
 
-    gt_loader = get_dataset_loader(name=args.dataset, batch_size=args.batch_size, num_frames=None, split=split, load_mode='gt')
-    gen_loader = get_dataset_loader(name=args.dataset, batch_size=args.batch_size, num_frames=None, split=split, load_mode='eval')
-    num_actions = gen_loader.dataset.num_actions
+    # gt_loader = get_dataset_loader(name=args.dataset, batch_size=args.batch_size, num_frames=None, split=split, load_mode='gt')
+    # gen_loader = get_dataset_loader(name=args.dataset, batch_size=args.batch_size, num_frames=None, split=split, load_mode='eval')
+    # num_actions = gen_loader.dataset.num_actions
+    gen_loader = Gen_loader()
 
-
-    # gen_loader.dataset.mean_for_eval == gt_loader.dataset.mean
-    # shape = (263,)
-    # motion_gt, length_gt = get_gt_motion(args, gt_loader, num_samples_limit)
-
-    # should be same 
 
     logger.log("Creating model and diffusion...")
     from diffusion.ddim import InpaintingGaussianDiffusion
@@ -761,10 +544,6 @@ if __name__ == '__main__':
     
     data_transform = DataTransform(device='cpu')
 
-    # motion_gen =  torch.Size([32, 263, 1, 196]) torch.Size([32])
-    # real_num_batches 1
-    # motion_gt =  torch.Size([32, 196, 263]) length_gt =  torch.Size([32])
-    # gen_loader.dataset.mean_for_eval
 
     replication_times=1
     fid_all_list = []
@@ -791,17 +570,6 @@ if __name__ == '__main__':
         motion_gen_joints_copy = motion_gen_joints.detach().clone()
         print(f"--> motion_gen = {motion_gen.shape}, motion_gen_joints = {motion_gen_joints.shape}")
 
-
-        # change shape for generated motions.
-        motion_gen = motion_gen.squeeze(2).permute(0,2,1).contiguous()
-        print('motion_gen = ', motion_gen.shape, length_gen.shape)
-        motion_gen = renorm(motion_gen, gen_loader.dataset)
-
-
-        # get gt motions
-        motion_gt, length_gt, texts_gt = get_gt_motion(args, gt_loader, num_samples_limit)
-        # print('motion_gt = ', motion_gt.shape, 'length_gt = ', length_gt.shape)
-
         
         # save result
         os.makedirs(args.save_fig_dir, exist_ok=True)
@@ -809,13 +577,14 @@ if __name__ == '__main__':
         if not do_evaluation:
             # save_to_npy_with_motion_gen
             save_npy_path = os.path.join(args.save_fig_dir, "gen.npy")
-            fid = 1.0
+            fid = None
+            motion_gen=None
             save_to_npy_with_motion_gen(save_npy_path, 
                         all_motions=motion_gen_joints_copy.data.cpu().numpy(), 
                         all_text=list(texts_gen),
                         all_lengths = length_gen.data.cpu().numpy(),
                         fid = fid,
-                        motion_gen = motion_gen.data.cpu().numpy(),
+                        motion_gen = motion_gen,
                         loss = loss_head_gen, 
                         constraint = constraint_gen 
             )

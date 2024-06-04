@@ -22,8 +22,8 @@ def read_loss(npy_file_name):
     loss_list   = data_npy["loss"]
     loss = loss_list.mean()
     # print("loss_list.shape = ", loss_list.shape)
-    print(f"sample_list.shape = {sample_list.shape}")
-    print(f"loss_list.shape = {loss_list.shape}", f"loss_val = {loss:.5f}")
+    # print(f"sample_list.shape = {sample_list.shape}")
+    print(f"constraint_error = {loss:.5f}")
 
 
 

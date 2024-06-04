@@ -279,8 +279,12 @@ def add_edit_inpainting_options(parser):
                        help="If true, will show the motion from which the inpainting features were taken.")
 
 def add_evaluation_options(parser):
+    from config_data import MODEL_PATH
     group = parser.add_argument_group('eval')
-    group.add_argument("--model_path", required=True, type=str,
+    # group.add_argument("--model_path", required=True, type=str,
+    #                    help="Path to model####.pt file to be sampled.")
+    group.add_argument("--model_path", required=False, type=str,
+                       default = MODEL_PATH,
                        help="Path to model####.pt file to be sampled.")
     group.add_argument("--eval_mode", default='wo_mm', choices=['wo_mm', 'mm_short', 'debug', 'full'], type=str,
                        help="wo_mm (t2m only) - 20 repetitions without multi-modality metric; "

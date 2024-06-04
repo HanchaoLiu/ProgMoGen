@@ -20,3 +20,5 @@ from .render_overhead_barrier import render_overhead_barrier
 from .render_narrow_gap import render_narrow_gap
 
 from .render_center_of_mass import render_center_of_mass
+
+from .render_or import render_or

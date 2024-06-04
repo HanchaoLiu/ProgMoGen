@@ -231,7 +231,7 @@ def ddim_sample_loop_opt_fn_goal_relaxed(
 
     noise_init.requires_grad=False
     eta=0.0
-    assert eta==0.0
+    
 
     self.length = model_kwargs['y']['lengths'].item()
 

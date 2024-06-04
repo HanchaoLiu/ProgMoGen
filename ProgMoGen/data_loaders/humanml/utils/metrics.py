@@ -106,8 +106,8 @@ def calculate_diversity_with_idx_nocheck(activation, diversity_times):
     first_indices = np.random.choice(num_samples, diversity_times, replace=False)
     second_indices = np.random.choice(num_samples, diversity_times, replace=False)
 
-    print("first_indices = ", first_indices[:10])
-    print("second_indices = ", second_indices[:10])
+    # print("first_indices = ", first_indices[:10])
+    # print("second_indices = ", second_indices[:10])
 
     dist = linalg.norm(activation[first_indices] - activation[second_indices], axis=1)
     return dist.mean(), first_indices, second_indices

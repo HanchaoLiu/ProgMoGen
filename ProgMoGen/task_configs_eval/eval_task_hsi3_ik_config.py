@@ -14,16 +14,6 @@ from atomic_lib.math_utils import *
 task: inside a square.
 '''
 
-# TODO: requires token
-# TEXT_PROMPT="drunk walking animation turning around."
-# LENGTH=196
-# DEMO_NUM=4
-
-
-# optimizer params
-# lr=0.005
-# iterations=50
-# decay_steps=None
 
 
 def loss_limited_space(joints):
@@ -125,9 +115,9 @@ def ddim_sample_loop_opt_fn(
     self.skeleton = load_skeleton(device)
 
     noise_init.requires_grad=False
-    # assert eta==1.0
+    # 
     eta=0.0
-    assert eta==0.0
+    
 
     joints_pos_frame0 = self.skel_joints_template
 

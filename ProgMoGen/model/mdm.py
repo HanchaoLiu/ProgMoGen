@@ -5,7 +5,6 @@ import torch.nn.functional as F
 import clip
 from model.rotation2xyz import Rotation2xyz
 
-from config_data import CLIP_VERSION
 
 
 class MDM(nn.Module):
@@ -87,7 +86,7 @@ class MDM(nn.Module):
                 print('Loading CLIP...')
                 # print("clip_version=", clip_version)
                 
-                clip_version = CLIP_VERSION
+                # clip_version = CLIP_VERSION
                 self.clip_version = clip_version
                 self.clip_model = self.load_and_freeze_clip(clip_version)
             if 'action' in self.cond_mode:
@@ -150,7 +149,6 @@ class MDM(nn.Module):
         bs, njoints, nfeats, nframes = x.shape
         emb = self.embed_timestep(timesteps)  # [1, bs, d]
 
-        # print("(0)x.requires_grad=", x.requires_grad)
 
 
         force_mask = y.get('uncond', False)
@@ -169,22 +167,10 @@ class MDM(nn.Module):
             emb_gru = emb_gru.reshape(bs, self.latent_dim, 1, nframes)  #[bs, d, 1, #frames]
             x = torch.cat((x_reshaped, emb_gru), axis=1)  #[bs, d+joints*feat, 1, #frames]
 
-        # print("(1)x.requires_grad=", x.requires_grad)
 
-        # from IPython import embed 
-        # import sys 
-        # # print("inside model")
-        # # embed()
-        # for k,v in self.named_parameters():
-        #     print(k, v.requires_grad)
-        # for v in self.parameters():
-        #     print(v.requires_grad)
-        
 
         x = self.input_process(x)
 
-        # print("(2)x.requires_grad=", x.requires_grad)
-        # sys.exit(0)
 
         if self.arch == 'trans_enc':
             # adding the timestep embed
@@ -207,7 +193,7 @@ class MDM(nn.Module):
             xseq = self.sequence_pos_encoder(xseq)  # [seqlen, bs, d]
             output, _ = self.gru(xseq)
 
-        # print("(3)output.requires_grad=", output.requires_grad)
+
 
         output = self.output_process(output)  # [bs, njoints, nfeats, nframes]
         return output

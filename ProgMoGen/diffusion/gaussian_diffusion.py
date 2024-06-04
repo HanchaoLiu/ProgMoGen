@@ -419,11 +419,7 @@ class GaussianDiffusion:
         assert (
             model_mean.shape == model_log_variance.shape == pred_xstart.shape == x.shape
         )
-        # from IPython import embed 
-        # import sys 
-        # print("model mean and var")
-        # embed()
-        # sys.exit(0)
+
         return {
             "mean": model_mean,
             "variance": model_variance,
@@ -1076,10 +1072,7 @@ class GaussianDiffusion:
         if const_noise == True:
             raise NotImplementedError()
         
-        # print("in ddim_sample_loop, noise is None", noise is None)
-        # from IPython import embed 
-        # embed()
-        # sys.exit(0)
+
 
         final = None
         for sample in self.ddim_sample_loop_progressive(
@@ -1202,10 +1195,7 @@ class GaussianDiffusion:
         if const_noise == True:
             raise NotImplementedError()
         
-        # print("in ddim_sample_loop, noise is None", noise is None)
-        # from IPython import embed 
-        # embed()
-        # sys.exit(0)
+
 
         final = None
         for sample in self.ddim_sample_loop_progressive_opt(

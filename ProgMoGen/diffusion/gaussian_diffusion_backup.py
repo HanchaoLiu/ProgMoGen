@@ -404,11 +404,7 @@ class GaussianDiffusion:
         assert (
             model_mean.shape == model_log_variance.shape == pred_xstart.shape == x.shape
         )
-        # from IPython import embed 
-        # import sys 
-        # print("model mean and var")
-        # embed()
-        # sys.exit(0)
+
         return {
             "mean": model_mean,
             "variance": model_variance,

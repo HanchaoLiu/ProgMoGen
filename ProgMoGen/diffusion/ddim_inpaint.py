@@ -128,8 +128,7 @@ class InpaintingGaussianDiffusion(SpacedDiffusion):
             model_kwargs=model_kwargs,
         )
 
-        # embed()
-        # sys.exit(0)
+
 
         if cond_fn is not None:
             out = self.condition_score(cond_fn, out_orig, x, t, model_kwargs=model_kwargs)
@@ -624,9 +623,9 @@ class InpaintingGaussianDiffusion(SpacedDiffusion):
         self.load_inv_normalization_data(device)
 
         noise_init.requires_grad=False
-        # assert eta==1.0
+        # 
         eta=0.0
-        assert eta==0.0
+        
 
         pred_res, res_list, pred_x0_list = self.f_forward_return_middle_list(model, shape, noise_list, noise_init, init_image, model_kwargs, eta=eta, progress=False)
         pred_res_ret = pred_res.detach().clone()

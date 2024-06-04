@@ -355,7 +355,7 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
             # model_kwargs['y']['tokens'] = [None]*32
             # model_kwargs['y']['lengths'] = torch.LongTensor([motion_length]*32)
 
-            # ref_n32_data = np.load("/home/cscg/liuhc/m/ref_data/n32_data.npy", allow_pickle=True)
+            
             ref_n32_data = np.load(EVAL_SAMPLE32_FILE_NAME, allow_pickle=True)
             
             ref_text_prompt_list = [each_sample[0] for each_sample in ref_n32_data]
@@ -709,7 +709,7 @@ if __name__ == '__main__':
     fixseed(args.seed)
 
     args.batch_size = 32 # This must be 32! Don't change it! otherwise it will cause a bug in R precision calc!
-    args.model_path = MODEL_PATH
+
     name = os.path.basename(os.path.dirname(args.model_path))
     niter = os.path.basename(args.model_path).replace('model', '').replace('.pt', '')
 

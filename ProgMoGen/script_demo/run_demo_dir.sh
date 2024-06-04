@@ -7,11 +7,12 @@ eval_method="ours"
 ret_type="pos"
 text_split="test_plane_v0_id"
 num_samples_limit=32
-save_tag="or3"
+save_tag="directional"
 
 save_fig_dir="result/demo/${save_tag}_n${num_samples_limit}/${eval_method}_${ret_type}_npy"
 
-task_config="task_or_config"
+task_config="task_dir_config"
+
 
 ###############################################################################
 # generate motion
@@ -27,7 +28,7 @@ python3 tasks/run_demo_simple.py \
     --num_samples_limit ${num_samples_limit} \
     --task_config ${task_config}
 
-idx=0
+idx=4
 
 
 ###############################################################################
@@ -38,8 +39,6 @@ python3 -m visualize.plot_motion \
     --output_path "${save_fig_dir}/gen${idx}_video.gif" \
     --selected_idx ${idx}
 
-# exit
-
 
 ###############################################################################
 # generate mesh
@@ -47,7 +46,6 @@ python3 -m visualize.plot_motion \
 python3 -m visualize.render_mesh_each --input_path "${save_fig_dir}/gen.npy" --selected_idx ${idx}
 
 # exit
-
 
 ###############################################################################
 # render image/video
@@ -62,8 +60,8 @@ cd ../TEMOS-master
 mesh_file="${project_dir}/ProgMoGen/${save_fig_dir}/gen_smpl/gen${idx}_smpl_params.npy"
 echo ${mesh_file}
 
-${blender_app} --background --python render_demo_or1.py -- npy=${mesh_file} canonicalize=true mode="sequence"
-${blender_app} --background --python render_demo_or1.py -- npy=${mesh_file} canonicalize=true mode="video"
+${blender_app} --background --python render_demo_hod1.py -- npy=${mesh_file} canonicalize=true mode="sequence"
+${blender_app} --background --python render_demo_hod1.py -- npy=${mesh_file} canonicalize=true mode="video"
 echo "[Results are saved in ${save_fig_dir}/gen_smpl]"
 cd -
 

@@ -26,6 +26,7 @@ def f_loss(self, sample, sample_0, step):
     joints = self.sample_to_joints(sample)
     loss_confined_space = loss_ifelse_wholebody(joints, self.length)
 
+    # loss_reg on trajectory. Avoid standing still.
     loss_reg = equal( sample[:,0:4,:,:self.length], sample_0[:,0:4,:,:self.length] )
     loss = loss_confined_space + loss_reg 
     return loss 
@@ -47,6 +48,7 @@ def loss_ifelse_wholebody(sample, length):
     h2=1.4
 
     # loss head 
+    # add regularization on beginning and end frames.
     x_pos = dimZ( get_joint(sample, head) ).reshape(-1)
     selected_idx = (x_pos > 2.0) & (x_pos < 3.0)
     selected_idx2= (x_pos < 1.0) | (x_pos > 4.0)

@@ -129,8 +129,7 @@ class InpaintingGaussianDiffusion(SpacedDiffusion_v2):
             model_kwargs=model_kwargs,
         )
 
-        # embed()
-        # sys.exit(0)
+
 
         if cond_fn is not None:
             out = self.condition_score(cond_fn, out_orig, x, t, model_kwargs=model_kwargs)
@@ -624,7 +623,7 @@ class InpaintingGaussianDiffusion(SpacedDiffusion_v2):
         
 
         eta=0.0
-        assert eta==0.0
+        
 
         self.length = model_kwargs['y']['lengths'].item()
         
@@ -740,7 +739,7 @@ class InpaintingGaussianDiffusion(SpacedDiffusion_v2):
         
 
         eta=0.0
-        assert eta==0.0
+        
 
         self.length = model_kwargs['y']['lengths'].item()
         

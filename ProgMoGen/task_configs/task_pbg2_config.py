@@ -89,7 +89,7 @@ def f_loss(self, sample, sample_0, it):
         loss_massctr = loss_massctr.mean()
         return loss_massctr
 
-    # regularization term on [r_velocity, l_velocity]
+    # regularization term on [r_velocity, l_velocity]. Avoid standing still.
     loss_root = equal(sample[:,:3,:,:], sample_0[:,:3,:,:])
 
     loss_two_hands      = loss_two_hands(sample, margin=0.4)

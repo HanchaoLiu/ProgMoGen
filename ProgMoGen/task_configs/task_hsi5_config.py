@@ -9,7 +9,7 @@ from atomic_lib.math_utils import *
 '''
 task: walking in a narrow gap.
 '''
-# This is a challenging case, so run multiple samples to get good result.
+# As this is a challenging case, run multiple samples to get good result.
 
 TEXT_PROMPT="a man walks forwards"
 TEXT_TOKEN=None

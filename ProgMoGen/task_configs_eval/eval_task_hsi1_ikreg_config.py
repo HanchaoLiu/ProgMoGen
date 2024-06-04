@@ -158,9 +158,9 @@ def ddim_sample_loop_opt_fn(
     self.skeleton = load_skeleton(device)
 
     noise_init.requires_grad=False
-    # assert eta==1.0
+    # 
     eta=0.0
-    assert eta==0.0
+    
 
     joints_pos_frame0 = self.skel_joints_template
 

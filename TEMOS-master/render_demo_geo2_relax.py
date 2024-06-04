@@ -167,7 +167,8 @@ def render_cli(cfg: DictConfig) -> None:
             vid_path = path.replace(".npy", f".{cfg.vid_ext}")
             if os.path.exists(vid_path):
                 continue
-
+        
+        # line parameters are hard-coded.
         out = render_line_relax(data, frames_folder,
                      denoising=cfg.denoising,
                      oldrender=cfg.oldrender,

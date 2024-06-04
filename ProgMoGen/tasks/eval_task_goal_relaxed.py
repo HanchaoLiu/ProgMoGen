@@ -795,7 +795,7 @@ if __name__ == '__main__':
 
 
     args.batch_size = 32 # This must be 32! Don't change it! otherwise it will cause a bug in R precision calc!
-    args.model_path = MODEL_PATH
+
     name = os.path.basename(os.path.dirname(args.model_path))
     niter = os.path.basename(args.model_path).replace('model', '').replace('.pt', '')
 
