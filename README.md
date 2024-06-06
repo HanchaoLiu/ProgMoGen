@@ -49,7 +49,7 @@ You can also refer to paths in `ProgMoGen/config_data.py` to check whether files
 Follow the instruction and data preprocessing steps [HumanML3D](https://github.com/EricGuo5513/HumanML3D.git) to prepare HumanML3D dataset. 
 
 Place HumanML3D folder under `ProgMoGen/dataset` as `ProgMoGen/dataset/HumanML3D`.
-If you wish to run the demo only, motion data is not needed.
+If you wish to run the demo only, motion data is not needed and just prepare `Mean.npy` and `Std.npy`.
 
 #### 4. Our data for experiments
 

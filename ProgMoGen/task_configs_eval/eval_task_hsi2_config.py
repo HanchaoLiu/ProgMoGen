@@ -12,13 +12,11 @@ task: overhead barrier.
 
 
 # optimizer params
-# lr=0.01
-# iterations=70
-# decay_steps=70//4*3
 
 lr=0.005
 iterations=100
-decay_steps=100//4*3
+decay_steps=None
+
 
 
 

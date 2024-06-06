@@ -2,7 +2,6 @@
 import os,sys 
 sys.path.append(os.path.join(os.path.dirname(__file__),".."))
 sys.path.append(os.path.join(os.path.dirname(__file__), "../task_configs_eval"))
-sys.path.append(os.path.join(os.path.dirname(__file__), "../task_configs_eval_others"))
 
 
 from diffusion.respace import SpacedDiffusion
@@ -44,7 +43,7 @@ import types
 
 from config_data import MODEL_PATH, ABS_BASE_PATH, ROOT_DIR, SKEL_JOINTS_TEMPLATE_FILE_NAME
 
-from config_data import EVAL_SAMPLE32_FILE_NAME, EVAL_HOI1_FILE_NAME
+from config_data import EVAL_SAMPLE32_FILE_NAME
 
 torch.multiprocessing.set_sharing_strategy('file_system')
 
@@ -72,9 +71,6 @@ def f_add_args(parser):
     parser.add_argument("--num_samples_limit", default=0, type=int, help="")
 
     parser.add_argument("--task_config", default='none', type=str, help="task configs")
-    parser.add_argument("--eval_task", default='none', type=str, help="task configs")
-
-    parser.add_argument("--diffusion_type", default='none', type=str, help="ddim, ddim_inpaint")
     return parser
 
 
@@ -200,6 +196,7 @@ def get_motion_embeddings(groundtruth_loader, eval_wrapper, device):
 def collate_fn(batch):
     batch.sort(key=lambda x: x[3], reverse=True)
     return default_collate(batch)
+
 
 
 
@@ -344,47 +341,28 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
 
             if num_samples_limit is not None and len(generated_motion) >= real_num_batches:
                 break
+
             
 
-            # eval_task="geo1"
-            # eval_task="hoi1"
-            eval_task = args.eval_task
-            assert eval_task in ["hoi1", "geo1"]
 
-            if eval_task=="geo1":
-                ref_n32_data = np.load(EVAL_SAMPLE32_FILE_NAME, allow_pickle=True)
-                ref_text_prompt_list = [each_sample[0] for each_sample in ref_n32_data]
-                ref_tokens_list      = [each_sample[1] for each_sample in ref_n32_data]
-                ref_length_list      = [int(each_sample[2]) for each_sample in ref_n32_data]
+            # text_prompt = import_class(f"{args.task_config}.TEXT_PROMPT")
+            # motion_length = import_class(f"{args.task_config}.LENGTH")
+            # model_kwargs['y']['text'] = [text_prompt]*32
+            # model_kwargs['y']['tokens'] = [None]*32
+            # model_kwargs['y']['lengths'] = torch.LongTensor([motion_length]*32)
 
-                model_kwargs['y']['text']    = ref_text_prompt_list
-                model_kwargs['y']['tokens']  = ref_tokens_list
-                model_kwargs['y']['lengths'] = torch.LongTensor(ref_length_list)
-
-                tokens = [t.split('_') for t in model_kwargs['y']['tokens']]
-
-            elif eval_task=="hoi1":
-                ref_n32_data = np.load(EVAL_HOI1_FILE_NAME, allow_pickle=True)
-                ref_text_prompt_list = [each_sample[0] for each_sample in ref_n32_data]
-                ref_tokens_list      = [each_sample[1] for each_sample in ref_n32_data]
-                ref_length_list      = [int(each_sample[2]) for each_sample in ref_n32_data]
-
-                model_kwargs['y']['text']    = ref_text_prompt_list
-                model_kwargs['y']['tokens']  = ref_tokens_list
-                model_kwargs['y']['lengths'] = torch.LongTensor(ref_length_list)
-
-                # no tokens
-                tokens = [[] for t in model_kwargs['y']['tokens']]
-            else:
-                raise ValueError()
+            ref_n32_data = np.load(EVAL_SAMPLE32_FILE_NAME, allow_pickle=True)
             
+            ref_text_prompt_list = [each_sample[0] for each_sample in ref_n32_data]
+            ref_tokens_list      = [each_sample[1] for each_sample in ref_n32_data]
+            ref_length_list      = [int(each_sample[2]) for each_sample in ref_n32_data]
 
-            if eval_task=="hoi1":
-                # (6,)
-                target_list_ref      = [each_sample[3] for each_sample in ref_n32_data]
-                target_list_ref = np.array(target_list_ref)
-                print(target_list_ref.shape)
-                model_kwargs['y']['target_list'] = target_list_ref
+            model_kwargs['y']['text']    = ref_text_prompt_list
+            model_kwargs['y']['tokens']  = ref_tokens_list
+            model_kwargs['y']['lengths'] = torch.LongTensor(ref_length_list)
+
+            tokens = [t.split('_') for t in model_kwargs['y']['tokens']]
+
 
 
             # add CFG scale to batch
@@ -405,26 +383,10 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
 
                 f_loss = import_class(f"{args.task_config}.f_loss")
                 f_eval = import_class(f"{args.task_config}.f_eval")
+
                 diffusion.f_loss = types.MethodType(f_loss, diffusion)
                 diffusion.f_eval = types.MethodType(f_eval, diffusion)
-
-                update_goal = import_class(f"{args.task_config}.update_goal")
-                diffusion.update_goal = types.MethodType(update_goal, diffusion)
-                transform_sample = import_class(f"{args.task_config}.transform_sample")
-                diffusion.transform_sample = types.MethodType(transform_sample, diffusion)
-
-                get_lr_schedule = import_class(f"{args.task_config}.get_lr_schedule")
-                diffusion.get_lr_schedule = types.MethodType(get_lr_schedule, diffusion)
-                
-                # only for geo1
-                if eval_task=="geo1":
-                    f_sample_random_plane = import_class(f"{args.task_config}.f_sample_random_plane")
-                    diffusion.f_sample_random_plane = types.MethodType(f_sample_random_plane, diffusion)
-                
-                # sample_fn = diffusion.ddim_sample_loop_opt_fn_goal_relaxed
-                ddim_sample_loop_opt_fn_goal_relaxed = import_class(f"{args.task_config}.ddim_sample_loop_opt_fn_goal_relaxed")
-                diffusion.ddim_sample_loop_opt_fn_goal_relaxed = types.MethodType(ddim_sample_loop_opt_fn_goal_relaxed, diffusion)
-                sample_fn = diffusion.ddim_sample_loop_opt_fn_goal_relaxed
+                sample_fn = diffusion.ddim_sample_loop_opt_fn
 
                 sample = []
                 loss = []
@@ -432,7 +394,8 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
                 lengths = model_kwargs['y']['lengths']
                 bs = motion.shape[0]
 
-                demo_num = import_class(f"{args.task_config}.DEMO_NUM")
+                # demo_num = import_class(f"{args.task_config}.DEMO_NUM")
+                demo_num=32
                 for ii in range(bs):
                     print(ii,bs)
 
@@ -444,24 +407,10 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
 
                     diffusion.length = length_each
 
-
-
-                    # diffusion.lr = import_class(f"{args.task_config}.lr")
+                    # load optimizer params.
+                    diffusion.lr = import_class(f"{args.task_config}.lr")
                     diffusion.iterations = import_class(f"{args.task_config}.iterations")
-                    diffusion.epoch_relax = import_class(f"{args.task_config}.epoch_relax")
-
-                    if eval_task=="hoi1":
-                        # get target 
-                        target_gt_list = model_kwargs_each['y']['target_list']
-                        target_gt = torch.FloatTensor(target_gt_list).to(dist_util.dev())
-                        diffusion.target_gt = target_gt
-                    elif eval_task=="geo1":
-                        # only for geo1
-                        target_gt_list = diffusion.f_sample_random_plane(r_range=3, seed=diffusion.np_seed)
-                        target_gt = torch.FloatTensor(target_gt_list).to(dist_util.dev())
-                        diffusion.target_gt = target_gt
-                    else:
-                        raise ValueError()
+                    diffusion.decay_steps = import_class(f"{args.task_config}.decay_steps")
 
                     sample_each = sample_fn(
                         model,
@@ -479,9 +428,7 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
                     )
                     sample.append(sample_each)
                     loss.append(diffusion.loss_ret_val)
-
-                    constraint_1d=target_gt_list.reshape(-1).tolist()
-                    constraint.append(constraint_1d)
+                    constraint.append([0,0,0])
 
                     print("-->loss_ret_val each = ", diffusion.loss_ret_val.mean())
 
@@ -696,49 +643,6 @@ class DataTransform(object):
         joints = joints.permute(0,3,1,2).contiguous()
         return joints
 
-    # relax 
-    def get_XZ_offset(self, joints):
-        '''
-        first frame, joint idx 0, only XZ dim.
-        joints : torch.Size([1, 22, 3, 196])
-        return : joints_dst_XZ = (1, 2)
-        '''
-        joints_XZ = joints[:,0,[0,2],0]
-        return joints_XZ
-
-
-    def add_XZ_offset(self, joints0, offset):
-        '''
-        joints : torch.Size([1, 22, 3, 196])
-        offset : joints_dst_XZ = (1, 2)
-        return 
-            joints: torch.Size([1, 22, 3, 196])
-        '''
-        joints = joints0.clone()
-        joints[:,:,0:1,:] += offset[:,0:1][:,None,:,None]
-        joints[:,:,2:3,:] += offset[:,1:2][:,None,:,None]
-        return joints
-
-
-    def sample_to_joints_with_XZ_offset(self, pred):
-        # shape = (args.batch_size, model.njoints, model.nfeats, max_frames)
-        # # torch.Size([1, 22, 3, 196])
-        # [1, 263, 1, 195]
-        assert pred.shape[1]==265
-        x_pred = pred[:,:263, :, :]
-        XZ_offset = pred[:,263:, 0, 0]
-
-        x_pred = self.do_inv_norm(x_pred)
-        
-        # torch.Size([2, 263, 1, 3])
-        sample = recover_from_ric(x_pred.permute(0,2,3,1).contiguous(), 22)
-        sample = sample.view(-1, *sample.shape[2:]).permute(0, 2, 3, 1)
-
-        sample = self.add_XZ_offset(sample, XZ_offset)
-
-        # torch.Size([1, 22, 3, 196])
-        # assert sample.shape[0]==1
-        return sample
 
 
 def get_loss_stat(loss_list):
@@ -796,7 +700,6 @@ if __name__ == '__main__':
     args = args_list[0]
     fixseed(args.seed)
 
-
     args.batch_size = 32 # This must be 32! Don't change it! otherwise it will cause a bug in R precision calc!
 
     name = os.path.basename(os.path.dirname(args.model_path))
@@ -852,14 +755,7 @@ if __name__ == '__main__':
 
 
     logger.log("Creating model and diffusion...")
-    # from diffusion.ddim_relax import InpaintingGaussianDiffusion
-    assert args.diffusion_type in ["ddim", "ddim_inpaint"]
-    if args.diffusion_type == "ddim":
-        from diffusion.ddim_relax import InpaintingGaussianDiffusion
-    elif args.diffusion_type == "ddim_inpaint":
-        from diffusion.ddim_relax_inpaint import InpaintingGaussianDiffusion
-    else:
-        raise ValueError()
+    from diffusion.ddim import InpaintingGaussianDiffusion
     DiffusionClass =  InpaintingGaussianDiffusion if args.filter_noise else SpacedDiffusion
     model, diffusion = load_model_blending_and_diffusion(args_list, gen_loader, dist_util.dev(), DiffusionClass=DiffusionClass)
 
@@ -883,9 +779,7 @@ if __name__ == '__main__':
         print("constraint_gen.shape = ", constraint_gen.shape)
         
         if args.ret_type=="pos":
-            # motion_gen_joints = data_transform.sample_to_joints(motion_gen)
-            motion_gen_joints = data_transform.sample_to_joints_with_XZ_offset(motion_gen)
-            motion_gen = motion_gen[:,:263,:,:]
+            motion_gen_joints = data_transform.sample_to_joints(motion_gen)
         elif args.ret_type=="rot":
             print("from rot!")
             motion_gen_joints = data_transform.sample_to_joints_from_rot(motion_gen)
@@ -922,5 +816,9 @@ if __name__ == '__main__':
                         loss = loss_head_gen, 
                         constraint = constraint_gen 
             )
-            
+
         
+
+
+
+

@@ -334,8 +334,6 @@ def get_gen_motion(args, model, dataloader, num_samples_limit, scale, init_motio
     for v in model.parameters():
         v.requires_grad=False
 
-    # here has a grad!!!
-    # with torch.no_grad():
 
     # for _ in range(real_num_batches//len(dataloader)):
     for _ in range(1):
@@ -841,9 +839,6 @@ if __name__ == '__main__':
     logger.configure()
 
     logger.log("creating data loader...")
-    # split = 'test'
-    # split = 'test_plane'
-    # split = 'test_plane_v0_id'
     split = args.text_split
 
     gt_loader = get_dataset_loader(name=args.dataset, batch_size=args.batch_size, num_frames=None, split=split, load_mode='gt')
@@ -851,11 +846,6 @@ if __name__ == '__main__':
     num_actions = gen_loader.dataset.num_actions
 
 
-    # gen_loader.dataset.mean_for_eval == gt_loader.dataset.mean
-    # shape = (263,)
-    # motion_gt, length_gt = get_gt_motion(args, gt_loader, num_samples_limit)
-
-    # should be same 
 
     logger.log("Creating model and diffusion...")
     from diffusion.ddim_relax import InpaintingGaussianDiffusion
@@ -865,10 +855,6 @@ if __name__ == '__main__':
     
     data_transform = DataTransform(device='cpu')
 
-    # motion_gen =  torch.Size([32, 263, 1, 196]) torch.Size([32])
-    # real_num_batches 1
-    # motion_gt =  torch.Size([32, 196, 263]) length_gt =  torch.Size([32])
-    # gen_loader.dataset.mean_for_eval
 
     replication_times=1
     fid_all_list = []
