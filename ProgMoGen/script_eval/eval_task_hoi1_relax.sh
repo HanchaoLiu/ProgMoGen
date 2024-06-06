@@ -1,12 +1,5 @@
 
 
-
-
-
-
-
-
-
 eval_method="ours"
 ret_type="pos"
 text_split="test_plane_v0_id"

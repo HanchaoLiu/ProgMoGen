@@ -24,9 +24,23 @@ The data files required for running experiments are the same as [MDM](https://gi
 
 - glove: Download files from `ProgMoGen/prepare/download_glove.sh` and place the directory as `ProgMoGen/glove`.
 
-- dataset: get directory `motion-diffusion-model/dataset` from [MDM](https://github.com/GuyTevet/motion-diffusion-model) and place it as `ProgMoGen/dataset`. Download `t2m` from `ProgMoGen/prepare/download_t2m_evaluators.sh` and place it as `ProgMoGen/t2m`. 
+```
+bash prepare/download_glove.sh
+```
 
-- body_models: Download files from `ProgMoGen/prepare/download_smpl_files.sh` (a folder named `body_models`) and place it under `ProgMoGen/body_models`. 
+- dataset:  Download `t2m` from `ProgMoGen/prepare/download_t2m_evaluators.sh` and place it as `ProgMoGen/t2m`. 
+
+```
+bash prepare/download_t2m_evaluators.sh
+```
+
+<!-- get directory `motion-diffusion-model/dataset` from [MDM](https://github.com/GuyTevet/motion-diffusion-model) and place it as `ProgMoGen/dataset`. -->
+
+- body_models: Download files from `ProgMoGen/prepare/download_smpl_files.sh` (a folder named `smpl`) and place it under `ProgMoGen/body_models`. 
+
+```
+bash prepare/download_smpl_files.sh
+```
 
 You can also refer to paths in `ProgMoGen/config_data.py` to check whether files are placed correctly.
 
@@ -50,7 +64,6 @@ Other data files with texts and constraints for quantitative experiments are pro
 
 After these steps, the data will be organized as following
 ```
-assets
 ProgMoGen
 |-- save/humanml_trans_enc_512
          |--model000475000.pt
@@ -71,10 +84,11 @@ ProgMoGen
           |-- new_joint_vecs
 
 TEMOS-master
+assets
 ```
 
 
-#### 5. Install blender for visualization
+#### 5. Install blender for visualization (optional)
 
 We use blender code from project [TEMOS](https://github.com/Mathux/TEMOS) for visualization. Follow the [instruction](https://github.com/Mathux/TEMOS) to install blender and bpy dependencies.
 In `ProgMoGen/script_demo/*.sh` scripts, replace `blender_app` path with your own path to blender application, and replace `project_dir` with your own absolute path to this github project.
@@ -86,12 +100,14 @@ In `ProgMoGen/script_demo/*.sh` scripts, replace `blender_app` path with your ow
 ProgMoGen
   |--diffusion          # ddim
   |--atomic_lib         # atomic constraint library
-  |--script_demo        # run demo in Figures
-  |--script_eval        # run evaluation in Tables
-  |--task_configs       # define error function and optimization parameters for demo.
-  |--task_configs_eval  # define error function and optimization parameters for evaluation.
   |--tasks              # main program
   |--eval               # quantitative evaluation
+  |--script_demo        # run demo in Figures
+  |--task_configs       # define error function and optimization parameters for demo.
+  |--script_eval        # run evaluation in Tables
+  |--task_configs_eval  # define error function and optimization parameters for evaluation.
+  |--script_eval_others # run evaluation for other baseline methods.
+  |--task_configs_eval_others  # define error function and optimization parameters for evaluation.
   |--my_data
   |--config_data.py
   ...
@@ -181,11 +197,17 @@ sh script_eval/eval_task_hoi1_relax.sh
 sh script_eval/eval_task_hsi2.sh
 ```
 
-Scripts for some other baseline methods are also provided.
 
 
-**Since the optimization for each sample takes several minutes, we run the generation for each sample only once to reduce test time when calcuating evaluation metrics. A set of text prompts and corresponding constraints are pre-defined and provided in `ProgMoGen/my_data`. Also, as the FID score is sensitive to the groundtruth samples selected for calculating statistics, we also provide code to calculate average FID by sampling groundtruth motions multiple times.**
 
+(Since the optimization for each sample takes several minutes, we run the generation for each sample only once to reduce test time when calcuating evaluation metrics. A set of text prompts and corresponding constraints are pre-defined and provided in `ProgMoGen/my_data`. Also, as the FID score is sensitive to the groundtruth samples selected for calculating statistics, we also provide code to calculate average FID by sampling groundtruth motions multiple times.)
+
+
+```
+sh script_eval/eval_task_hsi1_fid_nruns.sh <gen_npy_file>
+```
+
+Scripts for some other baseline methods are also provided in `ProgMoGen/script_eval_others`.
 
 
 <!---
@@ -215,9 +237,7 @@ sh script_eval/eval_task_hsi3_ikreg.sh
 --->
 
 
-```
-sh script_eval/eval_task_hsi1_fid_nruns.sh <gen_npy_file>
-```
+
 
 Results of LLM programming evaluated in the supplementary material are provided in `assets/GPT_programming`.
 
@@ -232,7 +252,7 @@ Our code is heavily built on:
 We thank them for kindly releasing their code.
 
 #### Bibtex
-If you find this code useful in your research, please cite:
+If you find this code useful in your research, please consider citing:
 
 ```
 @inproceedings{liu2024programmable,

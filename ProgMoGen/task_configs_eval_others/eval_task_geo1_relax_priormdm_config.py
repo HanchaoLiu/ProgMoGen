@@ -5,7 +5,6 @@ import numpy as np
 import time 
 
 from data_loaders.humanml.scripts.motion_process import recover_from_ric, recover_root_rot_pos, reverse_pose
-# from data_loaders.humanml.scripts.motion_process import recover_from_rot, recover_from_rot_with_skeleton
 
 from atomic_lib.relax_geometry import construct_plane, calc_RT_from_two_planes, apply_RT_on_joints
 
@@ -27,7 +26,6 @@ lr=1e-5
 epoch_relax=1
 iterations=100
 
-# right_wrist=21
 
 joint_control=left_wrist
 
@@ -188,7 +186,7 @@ def transform_sample(self, sample_ret, target_relaxed, target, frame0):
 
 def ddim_sample_loop_opt_fn_goal_relaxed(
     self,
-    model, 
+    model, model_2, 
     shape,
     noise=None,
     clip_denoised=True,
@@ -342,7 +340,7 @@ def ddim_sample_loop_opt_fn_goal_relaxed(
     self.n_noise=0
 
     # print("model.device=", model.device)
-    device = next(model.parameters()).device
+    device = next(model_2.parameters()).device
     
 
     # rng = np.random.default_rng(10)
@@ -374,7 +372,18 @@ def ddim_sample_loop_opt_fn_goal_relaxed(
         model_kwargs["y"].pop("inpainting_mask")
         assert ("inpainted_motion" not in model_kwargs["y"].keys()) and ("inpainting_mask" not in model_kwargs["y"].keys())
 
-    pred_res, res_list, pred_x0_list = self.f_forward_return_middle_list(model, shape, noise_list, noise_init, init_image, model_kwargs, eta=eta, progress=False)
+
+    
+    # noise_init = noise_init * 0.0
+    inpainting_mask, inpainted_motion = model_kwargs['y']['inpainting_mask'], model_kwargs['y']['inpainted_motion']
+    ones = th.ones_like(inpainting_mask, dtype=th.float, device=inpainting_mask.device)
+    inpainting_mask = ones * inpainting_mask
+    noise_init = (noise_init * (1 - inpainting_mask)) + (inpainted_motion * inpainting_mask)
+
+
+
+    # pred_res, res_list, pred_x0_list = self.f_forward_return_middle_list(model, shape, noise_list, noise_init, init_image, model_kwargs, eta=eta, progress=False)
+    pred_res, res_list, pred_x0_list = self.f_forward_return_middle_list(model_2, shape, noise_list, noise_init, init_image, model_kwargs, eta=eta, progress=False)
     pred_res_ret = pred_res.detach().clone()
 
 

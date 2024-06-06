@@ -2,6 +2,7 @@
 import os,sys 
 sys.path.append(os.path.join(os.path.dirname(__file__),".."))
 sys.path.append(os.path.join(os.path.dirname(__file__), "../task_configs_eval"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../task_configs_eval_others"))
 
 
 from diffusion.respace import SpacedDiffusion
@@ -823,8 +824,8 @@ if __name__ == '__main__':
 
 
         # get gt motions
-        motion_gt, length_gt, texts_gt = get_gt_motion(args, gt_loader, num_samples_limit)
-        print('motion_gt = ', motion_gt.shape, 'length_gt = ', length_gt.shape)
+        # motion_gt, length_gt, texts_gt = get_gt_motion(args, gt_loader, num_samples_limit)
+        # print('motion_gt = ', motion_gt.shape, 'length_gt = ', length_gt.shape)
 
         
         # save result
@@ -833,7 +834,7 @@ if __name__ == '__main__':
         if not do_evaluation:
             # save_to_npy_with_motion_gen
             save_npy_path = os.path.join(args.save_fig_dir, "gen.npy")
-            fid = 1.0
+            fid = None
             save_to_npy_with_motion_gen(save_npy_path, 
                         all_motions=motion_gen_joints_copy.data.cpu().numpy(), 
                         all_text=list(texts_gen),

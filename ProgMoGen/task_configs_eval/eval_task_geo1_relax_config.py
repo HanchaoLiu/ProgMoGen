@@ -5,7 +5,6 @@ import numpy as np
 import time 
 
 from data_loaders.humanml.scripts.motion_process import recover_from_ric, recover_root_rot_pos, reverse_pose
-# from data_loaders.humanml.scripts.motion_process import recover_from_rot, recover_from_rot_with_skeleton
 
 from atomic_lib.relax_geometry import construct_plane, calc_RT_from_two_planes, apply_RT_on_joints
 

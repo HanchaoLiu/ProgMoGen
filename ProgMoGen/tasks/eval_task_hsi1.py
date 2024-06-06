@@ -2,6 +2,7 @@
 import os,sys 
 sys.path.append(os.path.join(os.path.dirname(__file__),".."))
 sys.path.append(os.path.join(os.path.dirname(__file__), "../task_configs_eval"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../task_configs_eval_others"))
 
 
 from diffusion.respace import SpacedDiffusion
@@ -856,21 +857,7 @@ if __name__ == '__main__':
         
         # save result
         os.makedirs(args.save_fig_dir, exist_ok=True)
-        do_evaluation = True 
-        if not do_evaluation:
-            # save_to_npy_with_motion_gen
-            save_npy_path = os.path.join(args.save_fig_dir, "gen.npy")
-            fid = 1.0
-            save_to_npy_with_motion_gen(save_npy_path, 
-                        all_motions=motion_gen_joints_copy.data.cpu().numpy(), 
-                        all_text=list(texts_gen),
-                        all_lengths = length_gen.data.cpu().numpy(),
-                        fid = fid,
-                        motion_gen = motion_gen.data.cpu().numpy(),
-                        loss = loss_head_gen, 
-                        constraint = constraint_gen 
-            )
-            exit(0)
+        
         
 
 

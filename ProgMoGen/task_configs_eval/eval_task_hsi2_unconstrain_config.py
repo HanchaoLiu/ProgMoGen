@@ -60,7 +60,6 @@ def f_eval(self, sample, sample_0):
 
 
 
-
 def ddim_sample_loop_opt_fn(
     self,
     model,
@@ -140,6 +139,4 @@ def ddim_sample_loop_opt_fn(
     self.loss_ret_val = loss_head.data.cpu().numpy()
 
     return pred_res_ret
-
-
 
