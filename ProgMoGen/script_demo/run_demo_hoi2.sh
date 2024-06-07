@@ -55,10 +55,10 @@ python3 -m visualize.render_mesh_each --input_path "${save_fig_dir}/gen.npy" --s
 # render image/video
 ###############################################################################
 
-# absolute path to the project
-project_dir="/home/cscg/liuhc/ProgMoGen"
+# absolute path to this project
+project_dir="/path/to/ProgMoGen"
 # absolute path to blender app
-blender_app="/home/cscg/Downloads/blender-2.93.0/blender"
+blender_app="/path/to/blender-2.93.0/blender"
 
 cd ../TEMOS-master
 input_joint_file="${project_dir}/ProgMoGen/${save_fig_dir}/gen.npy"
