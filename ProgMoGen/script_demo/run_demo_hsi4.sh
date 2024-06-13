@@ -59,7 +59,7 @@ project_dir="/path/to/ProgMoGen"
 blender_app="/path/to/blender-2.93.0/blender"
 
 cd ../TEMOS-master
-mesh_file="${project_dir}/ProgMoGen/${save_fig_dir}/gen_smpl/gen${idx}_smpl_params.npy"
+mesh_file="${project_dir}/progmogen/${save_fig_dir}/gen_smpl/gen${idx}_smpl_params.npy"
 echo ${mesh_file}
 
 

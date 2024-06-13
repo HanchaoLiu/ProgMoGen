@@ -19,52 +19,80 @@ Follow the instruction of [PriorMDM](https://github.com/priorMDM/priorMDM) (or [
 
 The data files required for running experiments are the same as [MDM](https://github.com/GuyTevet/motion-diffusion-model). The required files include:
 
-- pretrained MDM model: `model000475000.pt` and `args.json`. Available at [MDM](https://github.com/GuyTevet/motion-diffusion-model) (HumanML3D humanml-encoder-512 (best model)). Place the folder as `ProgMoGen/save/humanml_trans_enc_512`.
+- pretrained MDM model: `model000475000.pt` and `args.json`. Available at [HumanML3D humanml-encoder-512 (best model)](https://drive.google.com/file/d/1PE0PK8e5a5j-7-Xhs5YET5U5pGh0c821/view?usp=sharing) provided by [MDM](https://github.com/GuyTevet/motion-diffusion-model). Place the folder as `progmogen/save/humanml_trans_enc_512`.
 
 
-- glove: Download files from `ProgMoGen/prepare/download_glove.sh` and place the directory as `ProgMoGen/glove`.
+- glove: Download files from `progmogen/prepare/download_glove.sh` and place the directory as `progmogen/glove`.
 
 ```
+cd progmogen
 bash prepare/download_glove.sh
 ```
 
-- dataset:  Download `t2m` from `ProgMoGen/prepare/download_t2m_evaluators.sh` and place it as `ProgMoGen/t2m`. 
+- dataset:  Download `t2m` from `progmogen/prepare/download_t2m_evaluators.sh` and place it as `progmogen/t2m`. 
 
 ```
 bash prepare/download_t2m_evaluators.sh
 ```
 
-<!-- get directory `motion-diffusion-model/dataset` from [MDM](https://github.com/GuyTevet/motion-diffusion-model) and place it as `ProgMoGen/dataset`. -->
+<!-- get directory `motion-diffusion-model/dataset` from [MDM](https://github.com/GuyTevet/motion-diffusion-model) and place it as `progmogen/dataset`. -->
 
-- body_models: Download files from `ProgMoGen/prepare/download_smpl_files.sh` (a folder named `smpl`) and place it under `ProgMoGen/body_models`. 
+- body_models: Download files from `progmogen/prepare/download_smpl_files.sh` (a folder named `smpl`) and place it under `progmogen/body_models`. 
 
 ```
 bash prepare/download_smpl_files.sh
 ```
 
-You can also refer to paths in `ProgMoGen/config_data.py` to check whether files are placed correctly.
+You can also refer to paths in `progmogen/config_data.py` to check whether files are placed correctly.
 
 
 #### 3. Get HumanML3D data
-Follow the instruction and data preprocessing steps [HumanML3D](https://github.com/EricGuo5513/HumanML3D.git) to prepare HumanML3D dataset. 
 
-Place HumanML3D folder under `ProgMoGen/dataset` as `ProgMoGen/dataset/HumanML3D`.
-If you wish to run the demo only, motion data is not needed and just prepare `Mean.npy` and `Std.npy`.
+Place HumanML3D folder under `progmogen/dataset` as `progmogen/dataset/HumanML3D`.
 
-#### 4. Our data for experiments
+a. The easy way (for demo)
 
-Copy `test_all_id.txt` and `test_plane_v0_id.txt` in `ProgMoGen/my_data` to `ProgMoGen/dataset/HumanML3D`. They are subsets of the test split used in our evaluation.
+[HumanML3D](https://github.com/EricGuo5513/HumanML3D.git)  - If you wish to run the demo only, motion data is not needed and just prepare `Mean.npy` and `Std.npy`.
 ```
-cp ProgMoGen/my_data/test_all_id.txt ProgMoGen/dataset/HumanML3D/
-cp ProgMoGen/my_data/test_plane_v0_id.txt ProgMoGen/dataset/HumanML3D/
+cp -r my_data/HumanML3D dataset/HumanML3D
 ```
 
-Other data files with texts and constraints for quantitative experiments are provided in `ProgMoGen/my_data`.
+b. Full data (text + motion capture for evaluation)
+
+[HumanML3D](https://github.com/EricGuo5513/HumanML3D.git)  - Follow the instructions in [HumanML3D](https://github.com/EricGuo5513/HumanML3D.git), prepare motion capture data, and then copy the result dataset to our repository:
+
+```
+cd ..
+git clone https://github.com/EricGuo5513/HumanML3D.git
+unzip ./HumanML3D/HumanML3D/texts.zip -d ./HumanML3D/HumanML3D/
+cp -r HumanML3D/HumanML3D progmogen/dataset/HumanML3D
+cd progmogen
+```
+
+
+
+
+
+#### 4. Our data for experiments (for evaluation only)
+
+Copy `test_all_id.txt` and `test_plane_v0_id.txt` in `progmogen/my_data` to `progmogen/dataset/HumanML3D`. They are subsets of the test split used in our evaluation.
+<!-- ```
+cp progmogen/my_data/test_all_id.txt progmogen/dataset/HumanML3D/
+cp progmogen/my_data/test_plane_v0_id.txt progmogen/dataset/HumanML3D/
+``` -->
+```
+cd dataset/HumanML3D
+ln -s ../../my_data/test_all_id.txt test_all_id.txt
+ln -s ../../my_data/test_plane_v0_id.txt test_plane_v0_id.txt
+cd ../..
+```
+
+Other data files with texts and constraints for quantitative experiments are provided in `progmogen/my_data`.
 
 
 After these steps, the data will be organized as following
 ```
-ProgMoGen
+progmogen
 |-- save/humanml_trans_enc_512
          |--model000475000.pt
          |--args.json
@@ -91,13 +119,13 @@ assets
 #### 5. Install blender for visualization (optional)
 
 We use blender code from project [TEMOS](https://github.com/Mathux/TEMOS) for visualization. Follow the [instruction](https://github.com/Mathux/TEMOS) to install blender and bpy dependencies.
-In `ProgMoGen/script_demo/*.sh` scripts, replace `blender_app` path with your own path to blender application, and replace `project_dir` with your own absolute path to this github project.
+In `progmogen/script_demo/*.sh` scripts, replace `blender_app` path with your own path to blender application, and replace `project_dir` with your own absolute path to this github project.
 
 
 
 ## Project structure
 ```
-ProgMoGen
+progmogen
   |--diffusion          # ddim
   |--atomic_lib         # atomic constraint library
   |--tasks              # main program
@@ -120,14 +148,14 @@ TEMOS-master
 ```
 
 ## Demo
-We provide scripts in `ProgMoGen/script_demo` for runnning examples presented in the paper. The script will generate motion `gen.npy` and fit smpl body sequences `gen_smpl/gen*_smpl_params.npy`. 
+We provide scripts in `progmogen/script_demo` for runnning examples presented in the paper. The script will generate motion `gen.npy` and fit smpl body sequences `gen_smpl/gen*_smpl_params.npy`. 
  
 For visualization, we provide (1) stick figure animation `gen*_video.gif` using matplotlib, and (2) image and video rendering `gen_smpl/gen*_smpl_params.png/mp4` using blender (scenes and objects are drawn using blender only).
 
-Results will be saved to `save_fig_dir` (under `ProgMoGen/results/demo`) and you can change in the script on your own. 
+Results will be saved to `save_fig_dir` (under `progmogen/results/demo`) and you can change in the script on your own. 
 
 ```
-cd ProgMoGen
+cd progmogen
 ```
 
 Motion Control with High-order Dynamics
@@ -184,12 +212,12 @@ For any other customized tasks, just write a `task_config.py` with customized `f
 We also implemented a simple framework for constraint relaxation. Refer to `run_demo_geo1_relax.sh` and `run_demo_geo2_relax.sh` for more details.
 
 ## Evaluation
-We provide scripts in `ProgMoGen/script_eval` for quantitative evaluation on some pre-defined tasks presented in the paper. The script will generate `gen.npy`, and calculate metrics using evaluation code in `ProgMoGen/eval`.
+We provide scripts in `progmogen/script_eval` for quantitative evaluation on some pre-defined tasks presented in the paper. The script will generate `gen.npy`, and calculate metrics using evaluation code in `progmogen/eval`.
 
-Results will be saved to `save_fig_dir` (under `ProgMoGen/results/eval`) and you can change in the script on your own.
+Results will be saved to `save_fig_dir` (under `progmogen/results/eval`) and you can change in the script on your own.
 
 ```
-cd ProgMoGen
+cd progmogen
 sh script_eval/eval_task_hsi1.sh
 sh script_eval/eval_task_hsi3.sh
 sh script_eval/eval_task_geo1_relax.sh
@@ -200,14 +228,14 @@ sh script_eval/eval_task_hsi2.sh
 
 
 
-(Since the optimization for each sample takes several minutes, we run the generation for each sample only once to reduce test time when calcuating evaluation metrics. A set of text prompts and corresponding constraints are pre-defined and provided in `ProgMoGen/my_data`. Also, as the FID score is sensitive to the groundtruth samples selected for calculating statistics, we also provide code to calculate average FID by sampling groundtruth motions multiple times.)
+(Since the optimization for each sample takes several minutes, we run the generation for each sample only once to reduce test time when calcuating evaluation metrics. A set of text prompts and corresponding constraints are pre-defined and provided in `progmogen/my_data`. Also, as the FID score is sensitive to the groundtruth samples selected for calculating statistics, we also provide code to calculate average FID by sampling groundtruth motions multiple times.)
 
 
 ```
 sh script_eval/eval_task_hsi1_fid_nruns.sh <gen_npy_file>
 ```
 
-Scripts for some other baseline methods are also provided in `ProgMoGen/script_eval_others`.
+Scripts for some other baseline methods are also provided in `progmogen/script_eval_others`.
 
 
 <!---
@@ -247,8 +275,9 @@ Results of LLM programming evaluated in the supplementary material are provided 
 Our code is heavily built on:
 [PriorMDM](https://github.com/priorMDM/priorMDM),
 [MDM](https://github.com/GuyTevet/motion-diffusion-model),
-[TEMOS](https://github.com/Mathux/TEMOS) and 
-[GMD](https://github.com/korrawe/guided-motion-diffusion/). 
+[TEMOS](https://github.com/Mathux/TEMOS), 
+[GMD](https://github.com/korrawe/guided-motion-diffusion/)  and
+[HumanML3D](https://github.com/EricGuo5513/HumanML3D). 
 We thank them for kindly releasing their code.
 
 #### Bibtex

@@ -5,7 +5,7 @@ MODEL_PATH="./save/humanml_trans_enc_512/model000475000.pt"
 
 
 # Mean.npy/Std.npy, t2m_mean.npy/t2m_std.npy in ddim_*.py and DataTranform in run_demo_*.py 
-# t2m checkpoint in ProgMoGen/data_loaders/humanml/networks/evaluator_wrapper.py
+# t2m checkpoint in progmogen/data_loaders/humanml/networks/evaluator_wrapper.py
 # $ROOT_DIR/dataset/HumanML3D in dataloaders/humanml/data/dataset.py
 # place HumanML3D dataset under $ROOT_DIR/dataset
 ROOT_DIR="."

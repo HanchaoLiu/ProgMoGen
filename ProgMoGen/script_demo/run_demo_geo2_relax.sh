@@ -58,8 +58,8 @@ project_dir="/path/to/ProgMoGen"
 blender_app="/path/to/blender-2.93.0/blender"
 
 cd ../TEMOS-master
-input_joint_file="${project_dir}/ProgMoGen/${save_fig_dir}/gen.npy"
-mesh_file="${project_dir}/ProgMoGen/${save_fig_dir}/gen_smpl/gen${idx}_smpl_params.npy"
+input_joint_file="${project_dir}/progmogen/${save_fig_dir}/gen.npy"
+mesh_file="${project_dir}/progmogen/${save_fig_dir}/gen_smpl/gen${idx}_smpl_params.npy"
 echo ${mesh_file}
 
 ${blender_app} --background --python render_demo_geo2_relax.py -- npy=${mesh_file} +npy_joint=${input_joint_file} +npy_joint_idx=${idx} canonicalize=true mode="sequence"

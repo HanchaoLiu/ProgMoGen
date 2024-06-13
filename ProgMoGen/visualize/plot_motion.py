@@ -50,25 +50,7 @@ def main():
 
     explicit_plot_3d_motion_debug(save_path, kinematic_tree, joints, title, dataset, figsize=(3, 3), fps=fps, radius=3, vis_mode="default")
 
-    # input_gen_path = "result/demo/or3_n32/ours_pos_npy/gen.npy"
-    # idx = 0
-    # save_path = f"result/demo/or3_n32/ours_pos_npy/gen{idx}_video.gif"
-
-    # input_gen_path = "result/demo/overhead_barrier_n32/ours_pos_npy/gen.npy"
-    # idx = 0
-    # save_path = f"result/demo/overhead_barrier_n32/ours_pos_npy/gen{idx}_video.gif"
-
-    # input_gen_path = "result/demo/limited_space_n32/ours_pos_npy/gen.npy"
-    # idx = 3
-    # save_path = f"result/demo/limited_space_n32/ours_pos_npy/gen{idx}_video.gif"
-
-    # input_gen_path = "result/demo/hold_ball_n32/ours_pos_npy/gen.npy"
-    # idx = 0
-    # save_path = f"result/demo/hold_ball_n32/ours_pos_npy/gen{idx}_video.gif"
-
-    # input_gen_path = "result/demo/narrow_gap_n32/ours_pos_npy/gen.npy"
-    # idx = 4
-    # save_path = f"result/demo/narrow_gap_n32/ours_pos_npy/gen{idx}_video.gif"
+    
 
 
 if __name__ == "__main__":
