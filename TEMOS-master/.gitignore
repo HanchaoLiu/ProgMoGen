@@ -8,7 +8,7 @@ __pycache__/
 outputs/
 gifs/
 deps/distilbert-base-uncased
-deps/smplh
+# deps/smplh
 datasets/
 *.ckpt
 *.gif
